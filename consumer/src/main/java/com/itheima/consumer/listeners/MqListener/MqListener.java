@@ -1,6 +1,10 @@
 package com.itheima.consumer.listeners.MqListener;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
@@ -30,10 +34,15 @@ public class MqListener {
         System.out.println("消费者2收到了 fanout.queue的消息：【" + msg + "】");
     }
 
-    @RabbitListener(queues = "direct.queue1")
+    @RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "direct.queue2", durable = "true"),
+            exchange = @Exchange(name = "hmall.direct", type = ExchangeTypes.DIRECT),
+            key = {"red", "yellow"}
+    ))
     public void listenDirectQueue1(String msg){
         System.out.println("消费者1 yellow 收到了 direct.queue的消息：【" + msg + "】");
     }
+
     @RabbitListener(queues = "direct.queue2")
     public void listenDirectQueue2(String msg){
         System.out.println("消费者2 blue   收到了 direct.queue的消息：【" + msg + "】");
@@ -48,4 +57,6 @@ public class MqListener {
     public void listenTopicQueue2(String msg){
         System.out.println("topic Exchanger 消费者2 收到了 topic.queue的消息：【" + msg + "】");
     }
+
+
 }

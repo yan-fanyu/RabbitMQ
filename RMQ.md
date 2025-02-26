@@ -158,6 +158,26 @@ Topic类型的交换机功能最强大，最推荐使用
 
 # Java 创建 队列Queue、交换机Exchanger和绑定关系 方式一
 # Java 创建 队列Queue、交换机Exchanger和绑定关系 方式二
+基于交换机和注解
+![img_23.png](img_23.png)
+![img_24.png](img_24.png)
+
+```java
+@RabbitListener(bindings = @QueueBinding(
+            value = @Queue(name = "direct.queue2", durable = "true"),
+            exchange = @Exchange(name = "hmall.direct", type = ExchangeTypes.DIRECT),
+            key = {"red", "yellow"}
+    ))
+public void listenDirectQueue1(String msg){
+    System.out.println("消费者1 yellow 收到了 direct.queue的消息：【" + msg + "】");
+}
+```
+
+# Java 消息转换器
+![img_25.png](img_25.png)
+对于对象类型的消息，会对其进行序列化处理，但是默认的序列化方法存在安全漏洞，\
+所以不推荐使用，建议使用JSON序列化进行操作
+![img_26.png](img_26.png)
 
 
 
