@@ -45,6 +45,119 @@
 
 # Java客户端操作
 
+生产者
+```java
+package com.itheima.publisher;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+@SpringBootApplication
+public class PublisherApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(PublisherApplication.class);
+        Queue<Integer> q = new LinkedList<>();
+
+    }
+}
+
+```
+消费之
+```java
+// MqListener.java
+package com.itheima.consumer.listeners.MqListener;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+public class MqListener {
+    @RabbitListener(queues = "simple.queue")
+    public void listenSimpleQueue(String msg){
+        System.out.println("消费者收到了simple.queue的消息：【" + msg + "】");
+    }
+}
+// ConsumerApplication.java
+package com.itheima.consumer;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class ConsumerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ConsumerApplication.class, args);
+    }
+}
+
+```
+
+# 一个案例需求分析 如何解决消息堆积问题 -> 使用 work 模型
+![img.png](img.png)
+1个publisher 2个消费者
+50条消息被消费50次。
+
+50条消息被平均分配给了两个消费者
+并没有考虑不同消费者的性能，而分配不同的任务数量
+
+解决办法：在配置文件中加入下面的配置信息
+```yaml
+logging:
+  pattern:
+    dateformat: MM-dd HH:mm:ss:SSS
+
+spring:
+  rabbitmq:
+    host: 118.89.147.177
+    port: 5672
+    virtual-host: /hmall
+    username: hmall
+    password: hmall
+    listener:
+      simple:
+        prefetch: 1
+```
+变成能者多劳
+![img_12.png](img_12.png)
+
+# Fanout 交换机
+三种
+![img_13.png](img_13.png)
+三种
+- Fanout 广播 \
+Publisher 把消息交给 Fanout 交换机后 交换机会把当前的消息转发给每一个 consumer
+![img_14.png](img_14.png)
+按照下图进行简单的测试
+![img_15.png](img_15.png)
+![img_16.png](img_16.png)
+- Direct 定向路由\
+每个交换机Exchanger与每个队列Queue要事先定义好两者之间的BindKey
+然后，发布者Publisher发送消息时候，要指定发消息的BindKey
+Exchanger根据BindKey发送到指定的Queue
+可以自由实现1对1,1对n
+![img_18.png](img_18.png)
+![img_17.png](img_17.png)
+
+
+![img_20.png](img_20.png)
+
+![img_19.png](img_19.png)
+- Topic 话题 \
+Topic Exchanger 交换机 
+绑定BindKey
+  通配符减少BindKey绑定的繁琐
+可以使用通配符 # 和 *
+![img_21.png](img_21.png)
+Topic类型的交换机功能最强大，最推荐使用
+![img_22.png](img_22.png)
+
+# Java 创建 队列Queue、交换机Exchanger和绑定关系 方式一
+# Java 创建 队列Queue、交换机Exchanger和绑定关系 方式二
 
 
 

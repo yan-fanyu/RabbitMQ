@@ -11,4 +11,41 @@ public class MqListener {
     public void listenSimpleQueue(String msg){
         System.out.println("消费者收到了simple.queue的消息：【" + msg + "】");
     }
+    @RabbitListener(queues = "work.queue")
+    public void listenWorkQueue1(String msg) throws InterruptedException {
+        System.out.println("消费者1收到了 work.queue的消息：【" + msg + "】");
+        Thread.sleep(20);
+    }
+    @RabbitListener(queues = "work.queue")
+    public void listenWorkQueue2(String msg) throws InterruptedException {
+        System.out.println("消费者2收到了 work.queue的消息：【" + msg + "】");
+        Thread.sleep(200);
+    }
+    @RabbitListener(queues = "fanout.queue1")
+    public void listenFanoutQueue1(String msg){
+        System.out.println("消费者1收到了 fanout.queue的消息：【" + msg + "】");
+    }
+    @RabbitListener(queues = "fanout.queue2")
+    public void listenFanoutQueue2(String msg){
+        System.out.println("消费者2收到了 fanout.queue的消息：【" + msg + "】");
+    }
+
+    @RabbitListener(queues = "direct.queue1")
+    public void listenDirectQueue1(String msg){
+        System.out.println("消费者1 yellow 收到了 direct.queue的消息：【" + msg + "】");
+    }
+    @RabbitListener(queues = "direct.queue2")
+    public void listenDirectQueue2(String msg){
+        System.out.println("消费者2 blue   收到了 direct.queue的消息：【" + msg + "】");
+    }
+
+
+    @RabbitListener(queues = "topic.queue1")
+    public void listenTopicQueue1(String msg){
+        System.out.println("topic Exchanger 消费者1 收到了 topic.queue的消息：【" + msg + "】");
+    }
+    @RabbitListener(queues = "topic.queue2")
+    public void listenTopicQueue2(String msg){
+        System.out.println("topic Exchanger 消费者2 收到了 topic.queue的消息：【" + msg + "】");
+    }
 }
